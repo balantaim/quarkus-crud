@@ -30,7 +30,7 @@ public class UserController {
     @APIResponses(value = {
             @APIResponse(
                     responseCode = "200",
-                    description = "Return users",
+                    description = "Get all users as page",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = UserDetailsDto.class)

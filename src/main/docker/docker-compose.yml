@@ -1,0 +1,17 @@
+services:
+  quarkus-datasource:
+    image: postgres:17.10-alpine
+    container_name: quarkus-crud
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: users
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: sa
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+volumes:
+  redis-data:
+  kafka-data:
+  postgres-data:
