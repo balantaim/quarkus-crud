@@ -1,12 +1,12 @@
 package com.martinatanasov.repositories;
 
 import com.martinatanasov.entities.User;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Page;
+import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 
-
-import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
@@ -35,8 +35,8 @@ public class UserRepository implements PanacheRepositoryBase<User, Long> {
         return find("userId = ?1 and " + ACTIVE, userId).firstResultOptional();
     }
 
-    public List<User> findAllPaged(int pageIndex, int pageSize) {
-        return findAll().page(Page.of(pageIndex, pageSize)).list();
+    public PanacheQuery<User> findAllOrdered(int pageIndex, int pageSize) {
+        return findAll(Sort.by("id")).page(Page.of(pageIndex, pageSize));
     }
 
 }

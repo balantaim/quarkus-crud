@@ -1,7 +1,5 @@
 package com.martinatanasov.services;
 
-import com.martinatanasov.models.UserChangePasswordDto;
-import com.martinatanasov.models.UserRegisterDto;
 import com.martinatanasov.results.PageUserResult;
 import com.martinatanasov.results.UserResult;
 
@@ -9,7 +7,7 @@ public interface UserService {
 
     PageUserResult findAll(int pageIndex, int pageSize);
 
-    UserResult createUser(UserRegisterDto userRegisterDto);
+    UserResult createUser(String email, String fullName, String password);
 
     UserResult findByEmail(String email);
 
@@ -19,7 +17,7 @@ public interface UserService {
 
     UserResult findByUserIdAndFullEnabled(String userId);
 
-    UserResult changeUserPassword(String userId, UserChangePasswordDto userChangePasswordDto);
+    UserResult changeUserPassword(String userId, String oldPassword, String newPassword);
 
     UserResult changeUserFullName(String userId, String newFullName);
 

@@ -1,8 +1,11 @@
 package com.martinatanasov.models;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
 import java.util.List;
 import java.util.function.Function;
 
+@RegisterForReflection
 public record PageResponse<T>(
         List<T> content,
         int page,
@@ -14,4 +17,5 @@ public record PageResponse<T>(
         return new PageResponse<>(content.stream().map(mapper).toList(),
                 page, size, totalElements, totalPages);
     }
+
 }

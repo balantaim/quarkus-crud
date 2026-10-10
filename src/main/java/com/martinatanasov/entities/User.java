@@ -197,4 +197,5 @@ public class User extends PanacheEntityBase {
                 ", modifiedDate=" + modifiedDate +
                 '}';
     }
+
 }
