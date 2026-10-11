@@ -25,14 +25,22 @@ import java.util.Set;
 @ApplicationScoped
 class UserServiceImpl implements UserService {
 
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordService passwordService;
+    private final UserMapper userMapper;
+
     @Inject
-    private UserRepository userRepository;
-    @Inject
-    private RoleRepository roleRepository;
-    @Inject
-    private PasswordService passwordService;
-    @Inject
-    private UserMapper userMapper;
+    UserServiceImpl(UserRepository userRepository,
+            RoleRepository roleRepository,
+            PasswordService passwordService,
+            UserMapper userMapper) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordService = passwordService;
+        this.userMapper = userMapper;
+    }
+
 
     @Override
     public PageUserResult findAll(int pageIndex, int pageSize) {

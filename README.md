@@ -40,7 +40,7 @@ http://localhost:5000/q/dev-ui/quarkus-agroal/database-view
 
 2. **Set property for the first application start `quarkus.flyway.migrate-at-start=true` after that turn it to** `false`
 
-**Add arguments for profile while running the app (NOT required):** `-Dquarkus.profile=development`
+**Add CLI arguments for profile while running the app (NOT required):** `-Dquarkus.profile=dev`
 
 ## Run the project with dev environment
 

@@ -7,6 +7,7 @@ import com.martinatanasov.models.UserRegisterDto;
 import com.martinatanasov.results.PageUserResult;
 import com.martinatanasov.results.UserResult;
 import com.martinatanasov.services.UserService;
+import io.smallrye.common.annotation.RunOnVirtualThread;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -19,14 +20,20 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
+@Tag(name = "Users")
 @Path("/api/v1/users")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Tag(name = "Users")
-public class UserController {
+//Enable reactive behavior via Virtual threads
+@RunOnVirtualThread
+class UserController {
+
+    private final UserService userService;
 
     @Inject
-    private UserService userService;
+    UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GET
     @Path("/")
@@ -169,7 +176,6 @@ public class UserController {
     public Response createNewUser(@Valid UserRegisterDto userRegisterDto) {
         return handleResponse(userService.createUser(userRegisterDto.email(), userRegisterDto.fullName(), userRegisterDto.password()));
     }
-
 
     private static Response handleResponse(PageUserResult result) {
         return switch (result) {
