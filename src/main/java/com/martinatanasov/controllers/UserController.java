@@ -8,6 +8,8 @@ import com.martinatanasov.results.PageUserResult;
 import com.martinatanasov.results.UserResult;
 import com.martinatanasov.services.UserService;
 import io.smallrye.common.annotation.RunOnVirtualThread;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -21,7 +23,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 @Tag(name = "Users")
-@Path("/api/v1/users")
+@Path("/api/users")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 //Enable reactive behavior via Virtual threads
@@ -37,6 +39,7 @@ class UserController {
 
     @GET
     @Path("/")
+    @RolesAllowed("ADMIN")
     // Swagger
     @APIResponses(value = {
             @APIResponse(
@@ -52,7 +55,6 @@ class UserController {
                     description = "No data found for the current page"
             )
     })
-//    @RolesAllowed("admin")
     public Response getAllUsers(
             @QueryParam("page") @DefaultValue("0") @Min(0) int page,
             @QueryParam("size") @DefaultValue("20") @Min(10) @Max(60) int size) {
@@ -61,6 +63,7 @@ class UserController {
 
     @GET
     @Path("/{userId}")
+    @RolesAllowed("CUSTOMER")
     @APIResponses(value = {
             @APIResponse(
                     responseCode = "200",
@@ -81,6 +84,7 @@ class UserController {
 
     @GET
     @Path("/email/{email}")
+    @RolesAllowed("ADMIN")
     @APIResponses(value = {
             @APIResponse(
                     responseCode = "200",
@@ -101,6 +105,7 @@ class UserController {
 
     @POST
     @Path("/change-password/{userId}")
+    @RolesAllowed({"ADMIN", "CUSTOMER"})
     @APIResponses(value = {
             @APIResponse(
                     responseCode = "200",
@@ -129,6 +134,7 @@ class UserController {
 
     @PUT
     @Path("/update-fullname/{userId}")
+    @RolesAllowed("CUSTOMER")
     @APIResponses(value = {
             @APIResponse(
                     responseCode = "200",
@@ -155,6 +161,7 @@ class UserController {
 
     @POST
     @Path("/register")
+    @PermitAll
     @APIResponses(value = {
             @APIResponse(
                     responseCode = "200",

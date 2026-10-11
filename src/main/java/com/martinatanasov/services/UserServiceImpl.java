@@ -52,7 +52,8 @@ class UserServiceImpl implements UserService {
             return new PageUserResult.NotFound();
         }
 
-        List<UserDetailsDto> content = query.list().stream()
+        List<UserDetailsDto> content = query.list()
+                .stream()
                 .map(userMapper::userToUserDataDto)
                 .toList();
 

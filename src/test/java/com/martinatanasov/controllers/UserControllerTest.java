@@ -5,6 +5,7 @@ import com.martinatanasov.results.UserResult;
 import com.martinatanasov.services.UserService;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
@@ -36,9 +37,10 @@ class UserControllerTest {
     }
 
     @Test
+    @TestSecurity(authorizationEnabled = false, user = "abv@abv.bg", roles = {"CUSTOMER"})
     void getByEmail() {
         Response response = given()
-                .when().get("/api/v1/users/email/abv@abv.bg")
+                .when().get("/api/users/email/abv@abv.bg")
                 .then()
                 .statusCode(200)
                 .extract().response();
