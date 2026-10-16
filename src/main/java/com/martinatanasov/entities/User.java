@@ -35,16 +35,16 @@ public class User extends PanacheEntityBase {
     private String userId;
 
     @Column(name = "account_non_expired", nullable = false)
-    private Boolean accountNonExpired = true;
+    private Boolean accountNonExpired;
 
     @Column(name = "account_non_locked", nullable = false)
-    private Boolean accountNonLocked = true;
+    private Boolean accountNonLocked;
 
     @Column(name = "credentials_non_expired", nullable = false)
-    private Boolean credentialsNonExpired = true;
+    private Boolean credentialsNonExpired;
 
     @Column(name = "enabled", nullable = false)
-    private Boolean enabled = true;
+    private Boolean enabled;
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)

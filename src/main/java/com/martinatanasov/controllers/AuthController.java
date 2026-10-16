@@ -1,21 +1,18 @@
 package com.martinatanasov.controllers;
 
-import com.martinatanasov.entities.User;
-import com.martinatanasov.models.AccessTokenResponse;
-import com.martinatanasov.models.LoginResponse;
-import com.martinatanasov.models.RefreshTokenDto;
-import com.martinatanasov.repositories.UserRepository;
-import com.martinatanasov.services.PasswordService;
-import com.martinatanasov.services.TokenService;
+import com.martinatanasov.models.request.RefreshTokenRequest;
+import com.martinatanasov.models.response.LoginResponse;
+import com.martinatanasov.models.response.RefreshTokenResponse;
+import com.martinatanasov.results.LoginResult;
+import com.martinatanasov.results.RefreshResult;
+import com.martinatanasov.services.AuthFacadeService;
 import io.smallrye.common.annotation.RunOnVirtualThread;
-import io.smallrye.jwt.auth.principal.JWTAuthContextInfo;
-import io.smallrye.jwt.auth.principal.JWTParser;
-import io.smallrye.jwt.auth.principal.ParseException;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
@@ -25,7 +22,6 @@ import org.jboss.resteasy.reactive.RestResponse;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Set;
 
 @Tag(name = "Auth")
 @Path("/auth")
@@ -33,28 +29,15 @@ import java.util.Set;
 @Produces(MediaType.APPLICATION_JSON)
 @RunOnVirtualThread
 @PermitAll
-public class AuthController {
+class AuthController {
 
-    private final UserRepository userRepository;
-    private final PasswordService passwordService;
-    private final TokenService tokenService;
-    private final JWTParser jwtParser;
-    private final JWTAuthContextInfo refreshContext;
+    private final AuthFacadeService authFacadeService;
+    private static final String BASIC = "Basic";
     private static final String HEADER_USER_ID = "User-Id";
 
     @Inject
-    public AuthController(UserRepository userRepository,
-            PasswordService passwordService,
-            TokenService tokenService,
-            JWTParser jwtParser,
-            JWTAuthContextInfo defaultContext) {
-        this.userRepository = userRepository;
-        this.passwordService = passwordService;
-        this.tokenService = tokenService;
-        this.jwtParser = jwtParser;
-        // Same keys and issuer as the default config, but expects aud=refresh
-        this.refreshContext = new JWTAuthContextInfo(defaultContext);
-        this.refreshContext.setExpectedAudience(Set.of(TokenService.REFRESH_AUDIENCE));
+    AuthController(AuthFacadeService authFacadeService) {
+        this.authFacadeService = authFacadeService;
     }
 
     @POST
@@ -76,16 +59,12 @@ public class AuthController {
     public RestResponse<LoginResponse> login(@HeaderParam("Authorization") String authorization) {
         String[] credentials = decodeBasic(authorization);
         if (credentials == null) {
-            throw new NotAuthorizedException("Basic");
+            throw new NotAuthorizedException(BASIC);
         }
-        User user = userRepository.findActiveByEmail(credentials[0].trim().toLowerCase())
-                .filter(u -> passwordService.matches(credentials[1], u.getPassword()))
-                .orElseThrow(() -> new NotAuthorizedException("Basic"));
+        final String email = credentials[0].trim().toLowerCase();
+        final String password = credentials[1];
 
-        return RestResponse.ResponseBuilder
-                .ok(issue(user))
-                .header(HEADER_USER_ID, user.getUserId())
-                .build();
+        return handleResponse(authFacadeService.authenticate(email, password));
     }
 
     @POST
@@ -96,7 +75,7 @@ public class AuthController {
                     description = "Refresh token success",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = AccessTokenResponse.class)
+                            schema = @Schema(implementation = RefreshTokenResponse.class)
                     )
             ),
             @APIResponse(
@@ -104,22 +83,8 @@ public class AuthController {
                     description = "Not authorized"
             )
     })
-    public RestResponse<AccessTokenResponse> refresh(@Valid RefreshTokenDto request) {
-        try {
-            var jwt = jwtParser.parse(request.refreshToken(), refreshContext);
-            User user = userRepository.findActiveByUserId(jwt.getSubject())
-                    .orElseThrow(() -> new NotAuthorizedException("Bearer"));
-
-            return RestResponse.ok(new AccessTokenResponse(tokenService.createAccessToken(user)));
-        } catch (ParseException e) {
-            throw new NotAuthorizedException("Bearer");
-        }
-    }
-
-    private LoginResponse issue(User user) {
-        return new LoginResponse(
-                tokenService.createAccessToken(user),
-                tokenService.createRefreshToken(user));
+    public RestResponse<RefreshTokenResponse> refresh(@Valid RefreshTokenRequest request) {
+        return handleResponse(authFacadeService.refresh(request.refreshToken()));
     }
 
     private static String[] decodeBasic(String header) {
@@ -132,6 +97,23 @@ public class AuthController {
         } catch (IllegalArgumentException e) {
             return null;
         }
+    }
+
+    private RestResponse<LoginResponse> handleResponse(LoginResult result) {
+        return switch (result) {
+            case LoginResult.Success success -> RestResponse.ResponseBuilder
+                    .ok(new LoginResponse(success.accessToken(), success.refreshToken()))
+                    .header(HEADER_USER_ID, success.userId())
+                    .build();
+            case LoginResult.Failure ignore -> RestResponse.status(Response.Status.UNAUTHORIZED);
+        };
+    }
+
+    private RestResponse<RefreshTokenResponse> handleResponse(RefreshResult result) {
+        return switch (result) {
+            case RefreshResult.Success success ->  RestResponse.ok(new RefreshTokenResponse(success.accessToken()));
+            case RefreshResult.Failure ignore -> RestResponse.status(Response.Status.UNAUTHORIZED);
+        };
     }
 
 }

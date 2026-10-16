@@ -1,9 +1,9 @@
 package com.martinatanasov.controllers;
 
-import com.martinatanasov.models.UserChangeFullNameDto;
-import com.martinatanasov.models.UserChangePasswordDto;
-import com.martinatanasov.models.UserDetailsDto;
-import com.martinatanasov.models.UserRegisterDto;
+import com.martinatanasov.models.request.UserChangeFullNameRequest;
+import com.martinatanasov.models.request.UserChangePasswordRequest;
+import com.martinatanasov.models.request.UserRegisterRequest;
+import com.martinatanasov.models.response.UserDetailsResponse;
 import com.martinatanasov.results.PageUserResult;
 import com.martinatanasov.results.UserResult;
 import com.martinatanasov.services.UserService;
@@ -47,7 +47,7 @@ class UserController {
                     description = "Get all users as page",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = UserDetailsDto.class)
+                            schema = @Schema(implementation = UserDetailsResponse.class)
                     )
             ),
             @APIResponse(
@@ -70,7 +70,7 @@ class UserController {
                     description = "Get user by userId",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = UserDetailsDto.class)
+                            schema = @Schema(implementation = UserDetailsResponse.class)
                     )
             ),
             @APIResponse(
@@ -91,7 +91,7 @@ class UserController {
                     description = "Get user by userId",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = UserDetailsDto.class)
+                            schema = @Schema(implementation = UserDetailsResponse.class)
                     )
             ),
             @APIResponse(
@@ -112,7 +112,7 @@ class UserController {
                     description = "Change password success",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = UserDetailsDto.class)
+                            schema = @Schema(implementation = UserDetailsResponse.class)
                     )
             ),
             @APIResponse(
@@ -126,9 +126,9 @@ class UserController {
     })
     public Response changePassword(
             @PathParam(value = "userId") @NotBlank @Size(max = 255) String userId,
-            @Valid UserChangePasswordDto userChangePasswordDto) {
+            @Valid UserChangePasswordRequest userChangePasswordRequest) {
         return handleResponse(userService.changeUserPassword(
-                userId, userChangePasswordDto.oldPassword(), userChangePasswordDto.newPassword())
+                userId, userChangePasswordRequest.oldPassword(), userChangePasswordRequest.newPassword())
         );
     }
 
@@ -141,7 +141,7 @@ class UserController {
                     description = "Change fullname success",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = UserDetailsDto.class)
+                            schema = @Schema(implementation = UserDetailsResponse.class)
                     )
             ),
             @APIResponse(
@@ -155,8 +155,8 @@ class UserController {
     })
     public Response changeFullName(
             @PathParam(value = "userId") @NotBlank @Size(max = 255) String userId,
-            @Valid UserChangeFullNameDto userChangeFullNameDto) {
-        return handleResponse(userService.changeUserFullName(userId, userChangeFullNameDto.fullName()));
+            @Valid UserChangeFullNameRequest userChangeFullNameRequest) {
+        return handleResponse(userService.changeUserFullName(userId, userChangeFullNameRequest.fullName()));
     }
 
     @POST
@@ -168,7 +168,7 @@ class UserController {
                     description = "A new user is created",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = UserDetailsDto.class)
+                            schema = @Schema(implementation = UserDetailsResponse.class)
                     )
             ),
             @APIResponse(
@@ -180,8 +180,12 @@ class UserController {
                     description = "User already exists"
             )
     })
-    public Response createNewUser(@Valid UserRegisterDto userRegisterDto) {
-        return handleResponse(userService.createUser(userRegisterDto.email(), userRegisterDto.fullName(), userRegisterDto.password()));
+    public Response createNewUser(@Valid UserRegisterRequest userRegisterRequest) {
+        return handleResponse(userService.createUser(
+                userRegisterRequest.email().toLowerCase(),
+                userRegisterRequest.fullName(),
+                userRegisterRequest.password())
+        );
     }
 
     private static Response handleResponse(PageUserResult result) {
@@ -193,7 +197,7 @@ class UserController {
 
     private static Response handleResponse(UserResult result) {
         return switch (result) {
-            case UserResult.Success success -> Response.ok(success.userDetailsDto()).build();
+            case UserResult.Success success -> Response.ok(success.userDetailsResponse()).build();
             case UserResult.AlreadyExists ignore -> Response.status(Response.Status.CONFLICT).build();
             case UserResult.NotFound ignore -> Response.status(Response.Status.NOT_FOUND).build();
         };

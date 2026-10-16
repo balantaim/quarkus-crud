@@ -1,13 +1,11 @@
-package com.martinatanasov.models;
+package com.martinatanasov.models.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-public record UserChangeFullNameDto(
-
-
+public record UserChangeFullNameRequest(
         @Schema(description = "Full name: letters and single spaces only",
                 examples = "Jane Doe")
         @NotBlank(message = "Full name is required")

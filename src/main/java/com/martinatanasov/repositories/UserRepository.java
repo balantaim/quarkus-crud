@@ -12,8 +12,10 @@ import java.util.Optional;
 @ApplicationScoped
 public class UserRepository implements PanacheRepositoryBase<User, Long> {
 
-    private static final String ACTIVE = "enabled = true and accountNonExpired = true " +
-                    "and credentialsNonExpired = true and accountNonLocked = true";
+    private static final String ACTIVE = "enabled = true " +
+            "and accountNonExpired = true " +
+            "and credentialsNonExpired = true " +
+            "and accountNonLocked = true";
 
     public Optional<User> findByEmail(String email) {
         return find("email", email).firstResultOptional();

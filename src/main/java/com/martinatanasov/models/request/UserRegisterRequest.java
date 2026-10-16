@@ -1,4 +1,4 @@
-package com.martinatanasov.models;
+package com.martinatanasov.models.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -15,8 +15,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
                 }
                 """
 )
-public record UserRegisterDto(
-
+public record UserRegisterRequest(
         @Schema(description = "Unique email address used to log in",
                 examples = "jane.doe@example.com",
                 maxLength = 255)
@@ -48,7 +47,6 @@ public record UserRegisterDto(
                 message = "Password must contain uppercase, lowercase, number, and special character"
         )
         String password
-
 ) {
 
 }

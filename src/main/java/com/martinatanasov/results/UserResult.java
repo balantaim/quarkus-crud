@@ -1,10 +1,10 @@
 package com.martinatanasov.results;
 
-import com.martinatanasov.models.UserDetailsDto;
+import com.martinatanasov.models.response.UserDetailsResponse;
 
-sealed public interface UserResult {
+public sealed interface UserResult {
 
-    record Success(UserDetailsDto userDetailsDto) implements  UserResult {}
+    record Success(UserDetailsResponse userDetailsResponse) implements UserResult {}
     record AlreadyExists() implements  UserResult {}
     record NotFound() implements  UserResult {}
 

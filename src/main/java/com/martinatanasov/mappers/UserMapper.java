@@ -1,14 +1,14 @@
 package com.martinatanasov.mappers;
 
 import com.martinatanasov.entities.User;
-import com.martinatanasov.models.UserDetailsDto;
+import com.martinatanasov.models.response.UserDetailsResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "jakarta-cdi")
 public interface UserMapper {
 
-    UserDetailsDto userToUserDataDto(User user);
+    UserDetailsResponse userToUserDetails(User user);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true)
@@ -18,6 +18,6 @@ public interface UserMapper {
     @Mapping(target = "enabled", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "modifiedDate", ignore = true)
-    User UserDataDtoToUser(UserDetailsDto userDetailsDto);
+    User UserDetailsToUser(UserDetailsResponse userDetailsResponse);
 
 }

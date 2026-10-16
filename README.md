@@ -2,9 +2,15 @@
 
 ## Software and requirements
 
+**Software architecture:** Monolithic application based on layered (n-tier) architecture using the MVC design pattern in the presentation layer.
+
 **Software/tools:** Quarkus, Java, ORM Panache, MapStruct, Flyway, OpenAPI for Quarkus, Validations, PostgreSQL, Password4j, Maven
 
 **Requirements:** Java, PostgreSQL/Docker
+
+## Description
+
+This is monolithic application written on Quarkus and based on the project https://github.com/balantaim/management-system-spring-cloud/tree/master/management-system-users
 
 ## Endpoints
 
@@ -38,7 +44,11 @@ http://localhost:5000/q/dev-ui/quarkus-agroal/database-view
     docker compose -p quarkus-datasource up -d
     ```
 
-2. **Set property for the first application start `quarkus.flyway.migrate-at-start=true` after that turn it to** `false`
+2. Generate `public.pem` and `private.pem` keys:
+    - save the keys into `resources` folder
+
+
+3. **Set property for the first application start `quarkus.flyway.migrate-at-start=true` after that turn it to** `false`
 
 **Add CLI arguments for profile while running the app (NOT required):** `-Dquarkus.profile=dev`
 

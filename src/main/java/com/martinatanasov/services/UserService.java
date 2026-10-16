@@ -1,7 +1,11 @@
 package com.martinatanasov.services;
 
+import com.martinatanasov.entities.User;
+import com.martinatanasov.results.AuthResult;
 import com.martinatanasov.results.PageUserResult;
 import com.martinatanasov.results.UserResult;
+
+import java.util.Optional;
 
 public interface UserService {
 
@@ -13,9 +17,9 @@ public interface UserService {
 
     UserResult findByUserId(String userId);
 
-    UserResult findByEmailAndFullEnabled(String email);
+    AuthResult findByEmailAndFullEnabled(String email);
 
-    UserResult findByUserIdAndFullEnabled(String userId);
+    Optional<User> findByUserIdAndFullEnabled(String userId);
 
     UserResult changeUserPassword(String userId, String oldPassword, String newPassword);
 

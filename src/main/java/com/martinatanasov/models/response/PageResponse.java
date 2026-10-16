@@ -1,4 +1,4 @@
-package com.martinatanasov.models;
+package com.martinatanasov.models.response;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 

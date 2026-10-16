@@ -3,11 +3,12 @@ package com.martinatanasov.services;
 import com.martinatanasov.entities.Role;
 import com.martinatanasov.entities.User;
 import com.martinatanasov.mappers.UserMapper;
-import com.martinatanasov.models.PageResponse;
 import com.martinatanasov.models.RoleName;
-import com.martinatanasov.models.UserDetailsDto;
+import com.martinatanasov.models.response.PageResponse;
+import com.martinatanasov.models.response.UserDetailsResponse;
 import com.martinatanasov.repositories.RoleRepository;
 import com.martinatanasov.repositories.UserRepository;
+import com.martinatanasov.results.AuthResult;
 import com.martinatanasov.results.PageUserResult;
 import com.martinatanasov.results.UserResult;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
@@ -52,13 +53,13 @@ class UserServiceImpl implements UserService {
             return new PageUserResult.NotFound();
         }
 
-        List<UserDetailsDto> content = query.list()
+        List<UserDetailsResponse> users = query.list()
                 .stream()
-                .map(userMapper::userToUserDataDto)
+                .map(userMapper::userToUserDetails)
                 .toList();
 
         return new PageUserResult.Success(new PageResponse<>(
-                content, pageIndex, pageSize, total, query.pageCount()
+                users, pageIndex, pageSize, total, query.pageCount()
         ));
     }
 
@@ -79,7 +80,11 @@ class UserServiceImpl implements UserService {
         user.setEmail(email);
         user.setFullName(fullName);
         user.setPassword(passwordService.encode(password));
+        // May be set to false if we require email verification
         user.setEnabled(true);
+        user.setAccountNonExpired(true);
+        user.setAccountNonLocked(true);
+        user.setCredentialsNonExpired(true);
         user.setRoles(roles);
 
         // userId is set in @PrePersist
@@ -87,7 +92,7 @@ class UserServiceImpl implements UserService {
         userRepository.flush();
         Log.infof("User registered: %s", user.getEmail());
         User createdUser = userRepository.findById(user.getId());
-        return new UserResult.Success(userMapper.userToUserDataDto(createdUser));
+        return new UserResult.Success(userMapper.userToUserDetails(createdUser));
     }
 
     @Override
@@ -96,7 +101,7 @@ class UserServiceImpl implements UserService {
         if (user.isEmpty()) {
             return new UserResult.NotFound();
         }
-        return new UserResult.Success(userMapper.userToUserDataDto(user.get()));
+        return new UserResult.Success(userMapper.userToUserDetails(user.get()));
     }
 
     @Override
@@ -105,25 +110,21 @@ class UserServiceImpl implements UserService {
         if (user.isEmpty()) {
             return new UserResult.NotFound();
         }
-        return new UserResult.Success(userMapper.userToUserDataDto(user.get()));
+        return new UserResult.Success(userMapper.userToUserDetails(user.get()));
     }
 
     @Override
-    public UserResult findByEmailAndFullEnabled(String email) {
+    public AuthResult findByEmailAndFullEnabled(String email) {
         Optional<User> activeByEmail = userRepository.findActiveByEmail(email);
         if (activeByEmail.isEmpty()) {
-            return new UserResult.NotFound();
+            return new AuthResult.NotFound();
         }
-        return new UserResult.Success(userMapper.userToUserDataDto(activeByEmail.get()));
+        return new AuthResult.Success(activeByEmail.get());
     }
 
     @Override
-    public UserResult findByUserIdAndFullEnabled(String userId) {
-        Optional<User> activeByUserId = userRepository.findActiveByUserId(userId);
-        if (activeByUserId.isEmpty()) {
-            return new UserResult.NotFound();
-        }
-        return new UserResult.Success(userMapper.userToUserDataDto(activeByUserId.get()));
+    public Optional<User> findByUserIdAndFullEnabled(String userId) {
+        return userRepository.findActiveByUserId(userId);
     }
 
     @Transactional
@@ -137,7 +138,7 @@ class UserServiceImpl implements UserService {
             throw new BadRequestException("Old password is incorrect");
         }
         user.get().setPassword(passwordService.encode(newPassword));
-        return new UserResult.Success(userMapper.userToUserDataDto(user.get()));
+        return new UserResult.Success(userMapper.userToUserDetails(user.get()));
     }
 
     @Transactional
@@ -149,7 +150,7 @@ class UserServiceImpl implements UserService {
         }
         user.get().setFullName(newFullName);
         userRepository.persist(user.get());
-        return new UserResult.Success(userMapper.userToUserDataDto(user.get()));
+        return new UserResult.Success(userMapper.userToUserDetails(user.get()));
     }
 
 }

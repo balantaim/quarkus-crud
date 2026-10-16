@@ -1,6 +1,6 @@
 package com.martinatanasov.controllers;
 
-import com.martinatanasov.models.UserDetailsDto;
+import com.martinatanasov.models.response.UserDetailsResponse;
 import com.martinatanasov.results.UserResult;
 import com.martinatanasov.services.UserService;
 import io.quarkus.test.InjectMock;
@@ -27,7 +27,7 @@ class UserControllerTest {
     @BeforeEach
     void setUp() {
         Mockito.when(userService.findByEmail(Mockito.anyString())).thenReturn(
-                new UserResult.Success(new UserDetailsDto("123",
+                new UserResult.Success(new UserDetailsResponse("123",
                         "abv@abv.bg",
                         "Ami go",
                         new HashSet<>(),

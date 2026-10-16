@@ -1,11 +1,10 @@
-package com.martinatanasov.models;
+package com.martinatanasov.models.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public record UserLoginDto(
-
+public record UserLoginRequest(
         @NotBlank(message = "Email is required")
         @Pattern(
                 regexp = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$",
@@ -20,7 +19,6 @@ public record UserLoginDto(
                 message = "Password must contain uppercase, lowercase, number, and special character"
         )
         String password
-
 ) {
 
 }
