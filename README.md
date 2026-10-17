@@ -4,7 +4,7 @@
 
 **Software architecture:** Monolithic application based on layered (n-tier) architecture using the MVC design pattern in the presentation layer.
 
-**Software/tools:** Quarkus, Java, ORM Panache, MapStruct, Flyway, OpenAPI for Quarkus, Validations, PostgreSQL, Password4j, Maven
+**Software/tools:** Quarkus, Java, ORM Panache, MapStruct, Flyway, OpenAPI for Quarkus, Validations, PostgreSQL, Password4j, SmallRye JWT, Maven
 
 **Requirements:** Java, PostgreSQL/Docker
 
@@ -45,8 +45,51 @@ http://localhost:5000/q/dev-ui/quarkus-agroal/database-view
     ```
 
 2. Generate `public.pem` and `private.pem` keys:
-    - save the keys into `resources` folder
+    - use the following bash script:
+      - A. use Java's `keytool` (Recommend)
 
+        ```bash
+           keytool -genkeypair \
+           -alias management-system-key \
+           -keyalg RSA \
+           -keysize 2048 \
+           -validity 3650 \
+           -storetype PKCS12 \
+           -keystore management-system.p12 \
+           -storepass <YOUR_STORE_PASSWORD> \
+           -keypass <YOUR_KEY_PASSWORD> \
+           -dname "CN=management-system, OU=Development, L=Sofia, C=BG"
+
+           keytool -exportcert \
+           -alias management-system-key \
+           -keystore management-system.p12 \
+           -storetype PKCS12 \
+           -rfc \
+           -file public.pem
+
+           openssl pkcs12 \
+           -in management-system.p12 \
+           -nocerts \
+           -nodes \
+           -out private-key-pkcs12.pem
+
+           openssl pkcs8 \
+           -topk8 \
+           -nocrypt \
+           -in private-key-pkcs12.pem \
+           -out private-key.pem
+        ```
+
+      - B. use openssl
+
+        ```bash
+        openssl genrsa -out rsaPrivateKey.pem 2048
+        openssl pkcs8 -topk8 -nocrypt -inform pem -in rsaPrivateKey.pem -outform pem -out private.pem
+        openssl rsa -pubout -in rsaPrivateKey.pem -out public.pem
+        rm rsaPrivateKey.pem
+        ```
+
+    - save the keys into `resources` folder
 
 3. **Set property for the first application start `quarkus.flyway.migrate-at-start=true` after that turn it to** `false`
 

@@ -1,0 +1,206 @@
+package com.martinatanasov.usersystem.controller;
+
+import com.martinatanasov.usersystem.model.request.UserChangeFullNameRequest;
+import com.martinatanasov.usersystem.model.request.UserChangePasswordRequest;
+import com.martinatanasov.usersystem.model.request.UserRegisterRequest;
+import com.martinatanasov.usersystem.model.response.UserDetailsResponse;
+import com.martinatanasov.usersystem.result.PageUserResult;
+import com.martinatanasov.usersystem.result.UserResult;
+import com.martinatanasov.usersystem.service.UserService;
+import io.smallrye.common.annotation.RunOnVirtualThread;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+
+@Tag(name = "Users")
+@Path("/api/users")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+//Enable reactive behavior via Virtual threads
+@RunOnVirtualThread
+class UserController {
+
+    private final UserService userService;
+
+    @Inject
+    UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GET
+    @Path("/")
+    @RolesAllowed("ADMIN")
+    // Swagger
+    @APIResponses(value = {
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Get all users as page",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserDetailsResponse.class)
+                    )
+            ),
+            @APIResponse(
+                    responseCode = "404",
+                    description = "No data found for the current page"
+            )
+    })
+    public Response getAllUsers(
+            @QueryParam("page") @DefaultValue("0") @Min(0) int page,
+            @QueryParam("size") @DefaultValue("20") @Min(10) @Max(60) int size) {
+        return handleResponse(userService.findAll(page, size));
+    }
+
+    @GET
+    @Path("/{userId}")
+    @RolesAllowed("CUSTOMER")
+    @APIResponses(value = {
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Get user by userId",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserDetailsResponse.class)
+                    )
+            ),
+            @APIResponse(
+                    responseCode = "404",
+                    description = "No data found for the current user"
+            )
+    })
+    public Response getById(@PathParam(value = "userId") @NotBlank @Size(max = 255) String userId) {
+        return handleResponse(userService.findByUserId(userId));
+    }
+
+    @GET
+    @Path("/email/{email}")
+    @RolesAllowed("ADMIN")
+    @APIResponses(value = {
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Get user by userId",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserDetailsResponse.class)
+                    )
+            ),
+            @APIResponse(
+                    responseCode = "404",
+                    description = "No data found for the current user"
+            )
+    })
+    public Response getByEmail(@PathParam(value = "email") @NotBlank @Email @Size(max = 255) String email) {
+        return handleResponse(userService.findByEmail(email.toLowerCase()));
+    }
+
+    @POST
+    @Path("/change-password/{userId}")
+    @RolesAllowed({"ADMIN", "CUSTOMER"})
+    @APIResponses(value = {
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Change password success",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserDetailsResponse.class)
+                    )
+            ),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Invalid credentials"
+            ),
+            @APIResponse(
+                    responseCode = "404",
+                    description = "No data found for the current user"
+            )
+    })
+    public Response changePassword(
+            @PathParam(value = "userId") @NotBlank @Size(max = 255) String userId,
+            @Valid UserChangePasswordRequest userChangePasswordRequest) {
+        return handleResponse(userService.changeUserPassword(
+                userId, userChangePasswordRequest.oldPassword(), userChangePasswordRequest.newPassword())
+        );
+    }
+
+    @PUT
+    @Path("/update-fullname/{userId}")
+    @RolesAllowed("CUSTOMER")
+    @APIResponses(value = {
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Change fullname success",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserDetailsResponse.class)
+                    )
+            ),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Invalid user data"
+            ),
+            @APIResponse(
+                    responseCode = "404",
+                    description = "No data found for the current user"
+            )
+    })
+    public Response changeFullName(
+            @PathParam(value = "userId") @NotBlank @Size(max = 255) String userId,
+            @Valid UserChangeFullNameRequest userChangeFullNameRequest) {
+        return handleResponse(userService.changeUserFullName(userId, userChangeFullNameRequest.fullName()));
+    }
+
+    @POST
+    @Path("/register")
+    @PermitAll
+    @APIResponses(value = {
+            @APIResponse(
+                    responseCode = "200",
+                    description = "A new user is created",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserDetailsResponse.class)
+                    )
+            ),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Invalid user data"
+            ),
+            @APIResponse(
+                    responseCode = "409",
+                    description = "User already exists"
+            )
+    })
+    public Response createNewUser(@Valid UserRegisterRequest userRegisterRequest) {
+        return handleResponse(userService.createUser(
+                userRegisterRequest.email().toLowerCase(),
+                userRegisterRequest.fullName(),
+                userRegisterRequest.password())
+        );
+    }
+
+    private static Response handleResponse(PageUserResult result) {
+        return switch (result) {
+            case PageUserResult.Success success -> Response.ok(success.users()).build();
+            case PageUserResult.NotFound ignore -> Response.status(Response.Status.NOT_FOUND).build();
+        };
+    }
+
+    private static Response handleResponse(UserResult result) {
+        return switch (result) {
+            case UserResult.Success success -> Response.ok(success.userDetailsResponse()).build();
+            case UserResult.AlreadyExists ignore -> Response.status(Response.Status.CONFLICT).build();
+            case UserResult.NotFound ignore -> Response.status(Response.Status.NOT_FOUND).build();
+        };
+    }
+
+}

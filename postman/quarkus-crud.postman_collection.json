@@ -303,7 +303,7 @@
               }
             },
             "url": {
-              "raw": "{{BASE_URL}}/api/users/update-fullname/772febb4-97c9-489d-bf22-6d8f8886967a",
+              "raw": "{{BASE_URL}}/api/users/update-fullname/{{USER_ID}}",
               "host": [
                 "{{BASE_URL}}"
               ],
@@ -311,7 +311,7 @@
                 "api",
                 "users",
                 "update-fullname",
-                "772febb4-97c9-489d-bf22-6d8f8886967a"
+                "{{USER_ID}}"
               ]
             }
           },

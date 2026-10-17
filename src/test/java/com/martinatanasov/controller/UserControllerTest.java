@@ -1,0 +1,57 @@
+package com.martinatanasov.controller;
+
+import com.martinatanasov.usersystem.model.response.UserDetailsResponse;
+import com.martinatanasov.usersystem.result.UserResult;
+import com.martinatanasov.usersystem.service.UserService;
+import io.quarkus.test.InjectMock;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+
+import static io.restassured.RestAssured.given;
+
+@QuarkusTest
+class UserControllerTest {
+
+    @InjectMock
+    private UserService userService;
+
+    @BeforeEach
+    void setUp() {
+        Mockito.when(userService.findByEmail(Mockito.anyString())).thenReturn(
+                new UserResult.Success(new UserDetailsResponse("123",
+                        "abv@abv.bg",
+                        "Ami go",
+                        new HashSet<>(),
+                        LocalDateTime.now())
+                )
+        );
+    }
+
+    @Test
+    @TestSecurity(authorizationEnabled = false, user = "abv@abv.bg", roles = {"CUSTOMER"})
+    void getByEmail() {
+        Response response = given()
+                .when().get("/api/users/email/abv@abv.bg")
+                .then()
+                .statusCode(200)
+                .extract().response();
+
+        JsonPath jsonPath = response.jsonPath();
+
+        Assertions.assertEquals(200, response.getStatusCode());
+        Assertions.assertEquals("123", jsonPath.getString("userId"));
+        Assertions.assertEquals("abv@abv.bg", jsonPath.getString("email"));
+        Assertions.assertNotNull(jsonPath.getString("fullName"));
+        Assertions.assertNotNull(jsonPath.getString("createdDate"));
+    }
+
+}
