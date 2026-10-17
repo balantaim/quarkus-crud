@@ -77,7 +77,7 @@ http://localhost:5000/q/dev-ui/quarkus-agroal/database-view
            -topk8 \
            -nocrypt \
            -in private-key-pkcs12.pem \
-           -out private-key.pem
+           -out private.pem
         ```
 
       - B. use openssl
