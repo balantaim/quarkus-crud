@@ -18,7 +18,6 @@ public class TokenService {
     public static final String REFRESH_AUDIENCE = "refresh";
     private static final String TOKEN_TYPE_CLAIM = "token_type";
     private static final String ACCESS_TOKEN_TYPE = "access";
-    private static final String REFRESH_TOKEN_TYPE = "refresh";
     private static final String AUTHORITIES_CLAIM = "authorities";
     private final String TOKEN_ISSUER;
     private final String AUDIENCE;
