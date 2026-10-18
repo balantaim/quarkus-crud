@@ -1,7 +1,7 @@
 package com.martinatanasov.usersystem.repository;
 
 import com.martinatanasov.usersystem.entity.Role;
-import com.martinatanasov.usersystem.model.RoleName;
+import com.martinatanasov.usersystem.entity.RoleName;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 

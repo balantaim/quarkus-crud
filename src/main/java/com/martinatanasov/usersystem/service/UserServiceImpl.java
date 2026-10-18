@@ -1,9 +1,9 @@
 package com.martinatanasov.usersystem.service;
 
 import com.martinatanasov.usersystem.entity.Role;
+import com.martinatanasov.usersystem.entity.RoleName;
 import com.martinatanasov.usersystem.entity.User;
 import com.martinatanasov.usersystem.mapper.UserMapper;
-import com.martinatanasov.usersystem.model.RoleName;
 import com.martinatanasov.usersystem.model.response.PageResponse;
 import com.martinatanasov.usersystem.model.response.UserDetailsResponse;
 import com.martinatanasov.usersystem.repository.RoleRepository;
@@ -71,7 +71,7 @@ class UserServiceImpl implements UserService {
             return new UserResult.AlreadyExists();
         }
         Role customerRole = roleRepository.findByName(RoleName.CUSTOMER)
-                .orElseThrow(() -> new RuntimeException("Role CUSTOMER not found"));
+                .orElseThrow(() -> new IllegalStateException("Role CUSTOMER not found"));
 
         Set<Role> roles = new HashSet<>();
         roles.add(customerRole);

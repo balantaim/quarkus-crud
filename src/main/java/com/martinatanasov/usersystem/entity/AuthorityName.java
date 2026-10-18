@@ -1,4 +1,4 @@
-package com.martinatanasov.usersystem.model;
+package com.martinatanasov.usersystem.entity;
 
 public enum AuthorityName {
     CUSTOMER_READ,

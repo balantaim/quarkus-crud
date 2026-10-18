@@ -1,7 +1,6 @@
 package com.martinatanasov.usersystem.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.martinatanasov.usersystem.model.AuthorityName;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;

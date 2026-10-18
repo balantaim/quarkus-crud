@@ -20,6 +20,7 @@
 
         <password4j.version>1.8.4</password4j.version>
         <mapstruct.version>1.6.3</mapstruct.version>
+        <bootui.version>2.1.0</bootui.version>
     </properties>
 
     <dependencyManagement>
@@ -107,6 +108,14 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-arc</artifactId>
         </dependency>
+
+        <!-- BootUI for Quarkus -->
+        <dependency>
+            <groupId>com.julien-dubois.bootui</groupId>
+            <artifactId>bootui-quarkus</artifactId>
+            <version>${bootui.version}</version>
+        </dependency>
+
         <!-- Yaml support -->
 <!--        <dependency>-->
 <!--            <groupId>io.quarkus</groupId>-->

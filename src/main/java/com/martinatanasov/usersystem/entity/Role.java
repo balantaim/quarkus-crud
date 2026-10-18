@@ -1,7 +1,6 @@
 package com.martinatanasov.usersystem.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.martinatanasov.usersystem.model.RoleName;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -33,7 +32,7 @@ public class Role extends PanacheEntityBase {
     private Set<User> users = new HashSet<>();
 
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(
             name = "roles_authorities",
             joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
