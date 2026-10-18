@@ -4,7 +4,7 @@
 
 **Software architecture:** Monolithic application based on layered (n-tier) architecture using the MVC design pattern in the presentation layer.
 
-**Software/tools:** Quarkus, Java, ORM Panache, MapStruct, Flyway, OpenAPI for Quarkus, Validations, PostgreSQL, Password4j, SmallRye JWT, Maven
+**Software/tools:** Quarkus, Java, ORM Panache, MapStruct, Flyway, OpenAPI for Quarkus, Validations, PostgreSQL, Password4j, SmallRye JWT, BootUI, Maven
 
 **Requirements:** Java, PostgreSQL/Docker
 
@@ -28,6 +28,9 @@ http://localhost:5000/q/dev-ui
 
 - Database viewer:
 http://localhost:5000/q/dev-ui/quarkus-agroal/database-view
+
+- Boot UI (only on `dev` mode):
+http://localhost:5000/bootui
 
 ## Postman
 
