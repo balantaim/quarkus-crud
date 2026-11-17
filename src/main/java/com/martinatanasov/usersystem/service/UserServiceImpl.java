@@ -99,6 +99,7 @@ class UserServiceImpl implements UserService {
     public UserResult findByEmail(String email) {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) {
+            Log.warnf("User with email not found: %s", email);
             return new UserResult.NotFound();
         }
         return new UserResult.Success(userMapper.userToUserDetails(user.get()));
@@ -108,6 +109,7 @@ class UserServiceImpl implements UserService {
     public UserResult findByUserId(String userId) {
         Optional<User> user = userRepository.findByUserId(userId);
         if (user.isEmpty()) {
+            Log.warnf("User with id not found: %s", userId);
             return new UserResult.NotFound();
         }
         return new UserResult.Success(userMapper.userToUserDetails(user.get()));
@@ -117,6 +119,7 @@ class UserServiceImpl implements UserService {
     public AuthResult findByEmailAndFullEnabled(String email) {
         Optional<User> activeByEmail = userRepository.findActiveByEmail(email);
         if (activeByEmail.isEmpty()) {
+            Log.warnf("Enabled user with email not found: %s", email);
             return new AuthResult.NotFound();
         }
         return new AuthResult.Success(activeByEmail.get());
@@ -132,6 +135,7 @@ class UserServiceImpl implements UserService {
     public UserResult changeUserPassword(String userId, String oldPassword, String newPassword) {
         Optional<User> user = userRepository.findActiveByUserId(userId);
         if (user.isEmpty()) {
+            Log.warnf("Enabled user with id not found: %s", userId);
             return new UserResult.NotFound();
         }
         if (!passwordService.matches(oldPassword, user.get().getPassword())) {
@@ -146,6 +150,7 @@ class UserServiceImpl implements UserService {
     public UserResult changeUserFullName(String userId, String newFullName) {
         Optional<User> user = userRepository.findByUserId(userId);
         if (user.isEmpty()) {
+            Log.warnf("Enabled user with id not found: %s", userId);
             return new UserResult.NotFound();
         }
         user.get().setFullName(newFullName);

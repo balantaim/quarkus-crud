@@ -165,14 +165,14 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{BASE_URL}}/api/users/f0912dfc-f1bf-4507-8420-44460d38725d",
+              "raw": "{{BASE_URL}}/api/users/5ddf5e1f-8064-4a5b-ad02-d0a5a06aaca3",
               "host": [
                 "{{BASE_URL}}"
               ],
               "path": [
                 "api",
                 "users",
-                "f0912dfc-f1bf-4507-8420-44460d38725d"
+                "5ddf5e1f-8064-4a5b-ad02-d0a5a06aaca3"
               ]
             }
           },
@@ -214,7 +214,7 @@
               }
             },
             "url": {
-              "raw": "{{BASE_URL}}/api/users/change-password/772febb4-97c9-489d-bf22-6d8f8886967a",
+              "raw": "{{BASE_URL}}/api/users/change-password/5ddf5e1f-8064-4a5b-ad02-d0a5a06aaca3",
               "host": [
                 "{{BASE_URL}}"
               ],
@@ -222,7 +222,7 @@
                 "api",
                 "users",
                 "change-password",
-                "772febb4-97c9-489d-bf22-6d8f8886967a"
+                "5ddf5e1f-8064-4a5b-ad02-d0a5a06aaca3"
               ]
             }
           },
@@ -295,7 +295,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"fullName\": \"{{$randomFullName}}\"\n}",
+              "raw": "{\n    \"fullName\": \"{{$randomFirstName}} {{$randomLastName}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

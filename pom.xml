@@ -109,6 +109,12 @@
             <artifactId>quarkus-arc</artifactId>
         </dependency>
 
+        <!-- Required for AWS Lambda -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-amazon-lambda-http</artifactId>
+        </dependency>
+
         <!-- BootUI for Quarkus -->
         <dependency>
             <groupId>com.julien-dubois.bootui</groupId>
@@ -121,6 +127,7 @@
 <!--            <groupId>io.quarkus</groupId>-->
 <!--            <artifactId>quarkus-config-yaml</artifactId>-->
 <!--        </dependency>-->
+
         <!-- Test -->
         <dependency>
             <groupId>io.quarkus</groupId>
