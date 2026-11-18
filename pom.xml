@@ -18,9 +18,10 @@
         <skipITs>true</skipITs>
         <surefire-plugin.version>3.5.6</surefire-plugin.version>
 
+        <compiler-plugin.version>3.16.0</compiler-plugin.version>
         <password4j.version>1.8.4</password4j.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <bootui.version>2.1.0</bootui.version>
+        <bootui.version>2.4.0</bootui.version>
     </properties>
 
     <dependencyManagement>
@@ -74,10 +75,7 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-openapi</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-swagger-ui</artifactId>
-        </dependency>
+
         <!-- Security -->
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -95,10 +93,10 @@
         </dependency>
 
         <!-- Alternative for Bcrypt password encoding -->
-<!--        <dependency>-->
-<!--            <groupId>io.quarkus</groupId>-->
-<!--            <artifactId>quarkus-elytron-security-common</artifactId>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>io.quarkus</groupId>-->
+        <!--            <artifactId>quarkus-elytron-security-common</artifactId>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -109,17 +107,10 @@
             <artifactId>quarkus-arc</artifactId>
         </dependency>
 
-        <!-- Required for AWS Lambda -->
+        <!-- Required for AWS Lambda for Quarkus -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-amazon-lambda-http</artifactId>
-        </dependency>
-
-        <!-- BootUI for Quarkus -->
-        <dependency>
-            <groupId>com.julien-dubois.bootui</groupId>
-            <artifactId>bootui-quarkus</artifactId>
-            <version>${bootui.version}</version>
         </dependency>
 
         <!-- Yaml support -->
@@ -205,7 +196,8 @@
                 <configuration>
                     <argLine>@{argLine}</argLine>
                     <systemPropertyVariables>
-                        <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
+                        <native.image.path>${project.build.directory}/${project.build.finalName}-runner
+                        </native.image.path>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>
                     </systemPropertyVariables>
@@ -215,6 +207,50 @@
     </build>
 
     <profiles>
+
+        <!-- Default profile for test -->
+        <profile>
+            <id>development</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <!-- Swagger -->
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-swagger-ui</artifactId>
+                </dependency>
+                <!-- BootUI for Quarkus -->
+                <dependency>
+                    <groupId>com.julien-dubois.bootui</groupId>
+                    <artifactId>bootui-quarkus</artifactId>
+                    <version>${bootui.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <!-- Production profile JAR -->
+        <profile>
+            <id>production</id>
+            <build>
+                <plugins>
+                    <!-- Profile production: Compiler plugin -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>${compiler-plugin.version}</version>
+                        <configuration>
+                            <excludes>
+                                <!-- Exclude specific classes or packages -->
+                                <exclude>**/management-system.p12</exclude>
+                                <exclude>**/private.pem</exclude>
+                                <exclude>**/public.pem</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- Native image profile -->
         <profile>
             <id>native</id>
             <activation>
@@ -227,6 +263,25 @@
                 <skipITs>false</skipITs>
                 <quarkus.native.enabled>true</quarkus.native.enabled>
             </properties>
+            <build>
+                <plugins>
+                    <!-- Profile native: Compiler plugin -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>${compiler-plugin.version}</version>
+                        <configuration>
+                            <excludes>
+                                <!-- Exclude specific classes or packages -->
+                                <exclude>**/management-system.p12</exclude>
+                                <exclude>**/private.pem</exclude>
+                                <exclude>**/public.pem</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
+
     </profiles>
 </project>

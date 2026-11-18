@@ -42,7 +42,6 @@ class UserServiceImpl implements UserService {
         this.userMapper = userMapper;
     }
 
-
     @Override
     public PageUserResult findAll(int pageIndex, int pageSize) {
         PanacheQuery<User> query = userRepository.findAllOrdered(pageIndex, pageSize);
@@ -67,7 +66,7 @@ class UserServiceImpl implements UserService {
     @Override
     public UserResult createUser(String email, String fullName, String password) {
         if (userRepository.findByEmail(email).isPresent()) {
-            Log.infof("User registered: %s", email);
+            Log.warnf("User registered: %s", email);
             return new UserResult.AlreadyExists();
         }
         Role customerRole = roleRepository.findByName(RoleName.CUSTOMER)
@@ -76,6 +75,21 @@ class UserServiceImpl implements UserService {
         Set<Role> roles = new HashSet<>();
         roles.add(customerRole);
 
+        User user = createNewUserRoleCustomer(email, fullName, password, roles);
+
+        // userId is set in @PrePersist
+        userRepository.persist(user);
+        userRepository.flush();
+        Log.infof("User registered: %s", user.getEmail());
+        User createdUser = userRepository.findById(user.getId());
+        return new UserResult.Success(userMapper.userToUserDetails(createdUser));
+    }
+
+    private User createNewUserRoleCustomer(
+            String email,
+            String fullName,
+            String password,
+            Set<Role> roles) {
         User user = new User();
         user.setEmail(email);
         user.setFullName(fullName);
@@ -86,13 +100,7 @@ class UserServiceImpl implements UserService {
         user.setAccountNonLocked(true);
         user.setCredentialsNonExpired(true);
         user.setRoles(roles);
-
-        // userId is set in @PrePersist
-        userRepository.persist(user);
-        userRepository.flush();
-        Log.infof("User registered: %s", user.getEmail());
-        User createdUser = userRepository.findById(user.getId());
-        return new UserResult.Success(userMapper.userToUserDetails(createdUser));
+        return user;
     }
 
     @Override

@@ -1,4 +1,8 @@
-#Maven
+src/main/resources/management-system.p12
+src/main/resources/private.pem
+src/main/resources/public.pem
+
+# Maven
 target/
 pom.xml.tag
 pom.xml.releaseBackup

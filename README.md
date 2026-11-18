@@ -4,15 +4,18 @@
 
 **Software architecture:** Monolithic application based on layered (n-tier) architecture using the MVC design pattern in the presentation layer.
 
-**Software/tools:** Quarkus, Java, ORM Panache, MapStruct, Flyway, OpenAPI for Quarkus, Validations, PostgreSQL, Password4j, SmallRye JWT, BootUI, Maven
+**Software/tools:** Quarkus, Java, ORM Panache, MapStruct, Flyway, OpenAPI for Quarkus, Validations, PostgreSQL, Password4j, SmallRye JWT, AWS lambda, BootUI, Maven
 
-**Requirements:** Java, PostgreSQL/Docker
+**Requirements:** Java, PostgreSQL/Docker, SAM CLI (Required only for AWS Lambda function)
 
 ## Description
 
-This is monolithic application written on Quarkus and based on the project https://github.com/balantaim/management-system-spring-cloud/tree/master/management-system-users
+This is monolithic application written on Quarkus and based on the project https://github.com/balantaim/management-system-spring-cloud.
+The service could be used with REST backend or as AWS Lambda Function.
+It is fully compatible with `management-system-frontend` and `management-system-desktop-client`.
+Link to test online: [management-system-spring-cloud.vercel.app](https://management-system-spring-cloud.vercel.app/)
 
-## Endpoints
+## Endpoints (dev profile)
 
 - Base path:
 http://localhost:5000
@@ -29,7 +32,7 @@ http://localhost:5000/q/dev-ui
 - Database viewer:
 http://localhost:5000/q/dev-ui/quarkus-agroal/database-view
 
-- Boot UI (only on `dev` mode):
+- Boot UI:
 http://localhost:5000/bootui
 
 ## Postman
@@ -83,7 +86,7 @@ http://localhost:5000/bootui
            -out private.pem
         ```
 
-      - B. use openssl
+      - B. use `openssl`
 
         ```bash
         openssl genrsa -out rsaPrivateKey.pem 2048
@@ -95,6 +98,9 @@ http://localhost:5000/bootui
     - save the keys into `resources` folder
 
 3. **Set property for the first application start `quarkus.flyway.migrate-at-start=true` after that turn it to** `false`
+4. **Export or include environment properties for the build**
+    - dev: `DEV_DB_URL`, `DEV_DB_USER`, `DEV_DB_PASS`
+    - prod (Optional): `DB_URL`, `DB_USER`, `DB_PASS`
 
 **Add CLI arguments for profile while running the app (NOT required):** `-Dquarkus.profile=dev`
 
@@ -107,7 +113,7 @@ http://localhost:5000/bootui
 ## Build production jar
 
 ```bash
-./mvnw package -Dquarkus.package.jar.type=uber-jar
+./mvnw package -Dproduction -Dquarkus.package.jar.type=uber-jar -DskipTests
 ```
 
 **Run the jar via following script:**
@@ -125,7 +131,7 @@ java -jar <your_application_jar>
 > This step requires running Docker.
 
 ```bash
-./mvnw package -Dnative -Dquarkus.native.container-build=true
+./mvnw package -Dnative -Dquarkus.native.container-build=true -DskipTests
 ```
 
 The native executable will be stored in `target` folder. The target OS for the native image is `Linux`.
