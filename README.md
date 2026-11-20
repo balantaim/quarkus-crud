@@ -1,5 +1,7 @@
 # Quarkus Crud Demo
 
+### License: [Apache 2.0](LICENSE)
+
 ## Software and requirements
 
 **Software architecture:** Monolithic application based on layered (n-tier) architecture using the MVC design pattern in the presentation layer.
