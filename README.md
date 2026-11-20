@@ -6,12 +6,12 @@
 
 **Software/tools:** Quarkus, Java, ORM Panache, MapStruct, Flyway, OpenAPI for Quarkus, Validations, PostgreSQL, Password4j, SmallRye JWT, AWS lambda, BootUI, Maven
 
-**Requirements:** Java, PostgreSQL/Docker, SAM CLI (Required only for AWS Lambda function)
+**Requirements:** Java, PostgreSQL/Docker, AWS SAM CLI (Required only for AWS Lambda function)
 
 ## Description
 
 This is monolithic application written on Quarkus and based on the project https://github.com/balantaim/management-system-spring-cloud.
-The service could be used with REST backend or as AWS Lambda Function.
+The service could be used as REST backend or as AWS Lambda Function.
 It is fully compatible with `management-system-frontend` and `management-system-desktop-client`.
 Link to test online: [management-system-spring-cloud.vercel.app](https://management-system-spring-cloud.vercel.app/)
 
@@ -100,7 +100,7 @@ http://localhost:5000/bootui
 3. **Set property for the first application start `quarkus.flyway.migrate-at-start=true` after that turn it to** `false`
 4. **Export or include environment properties for the build**
     - dev: `DEV_DB_URL`, `DEV_DB_USER`, `DEV_DB_PASS`
-    - prod (Optional): `DB_URL`, `DB_USER`, `DB_PASS`
+    - prod (Optional): `DB_URL`, `DB_USER`, `DB_PASS`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`
 
 **Add CLI arguments for profile while running the app (NOT required):** `-Dquarkus.profile=dev`
 
@@ -111,6 +111,9 @@ http://localhost:5000/bootui
 ```
 
 ## Build production jar
+
+> [!NOTE]
+> You can safely remove dependency `quarkus-amazon-lambda-http` if the project is not used as lambda.
 
 ```bash
 ./mvnw package -Dproduction -Dquarkus.package.jar.type=uber-jar -DskipTests
@@ -124,7 +127,6 @@ cd target/
 java -jar <your_application_jar>
 ```
 
-
 ## Build native image (Optional)
 
 > [!IMPORTANT]
@@ -136,21 +138,50 @@ java -jar <your_application_jar>
 
 The native executable will be stored in `target` folder. The target OS for the native image is `Linux`.
 
+## Lambda Function (Optional)
+
+You will need AWS SAN CLI tool installed in order to test and deploy it.
+Build your jar or native image then test it with the following script:
+
+- Native image:
+
+    ```bash
+    sam local start-api   --template target/sam.native.yaml
+    ```
+
+- Jar package:
+
+    ```bash
+    sam local start-api   --template target/sam.jvm.yaml
+    ```
+
+In order to deploy the lambda to AWS Cloud you will need to set up environment with API Gateway.
+
+API Gateway configuration:
+- Exposed headers `User-Id`
+- Allowed headers: `Authorization`, `Content-Type`, `Client-Platform-Id`
+- Allowed methods: `GET`, `POST`, `PUT`, `DELETE`, `OPTIONS`
+- Set `Access-Control-Allow-Credentials`: `NO`
+- Set `Access-Control-Allow-Origin`: `<your_frontend_application_domain>`
+- Set your `Routes` endpoints similar like existing REST endpoints
+
 ### Default users
 
 1. **Customer user:**
-
-    Username: `abv@abv.bg`
-
-    Password: `Pass123!`
+    - Username: `abv@abv.bg`
+    - Password: `Pass123!`
 
 ---
 
 2. **Admin user:**
+    - Username: `admin@abv.bg`
+    - Password: `Pass123!`
 
-    Username: `admin@abv.bg`
+## Gallery
 
-    Password: `Pass123!`
+![Swagger](images/swagger.png)
+![AWS Lambda](images/lambda-function.png)
+![BootUI](images/bootui.png)
 
 ## Contact me
 
