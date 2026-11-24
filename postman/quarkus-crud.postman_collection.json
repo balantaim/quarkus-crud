@@ -203,7 +203,12 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Client-Platform-Id",
+                "value": "1000"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"oldPassword\": \"Test123!\",\n    \"newPassword\": \"Test123!\"\n}",
@@ -214,7 +219,7 @@
               }
             },
             "url": {
-              "raw": "{{BASE_URL}}/api/users/change-password/5ddf5e1f-8064-4a5b-ad02-d0a5a06aaca3",
+              "raw": "{{BASE_URL}}/api/users/change-password/4bf3e342-79b6-4e56-bb37-ec32acd8048f",
               "host": [
                 "{{BASE_URL}}"
               ],
@@ -222,7 +227,7 @@
                 "api",
                 "users",
                 "change-password",
-                "5ddf5e1f-8064-4a5b-ad02-d0a5a06aaca3"
+                "4bf3e342-79b6-4e56-bb37-ec32acd8048f"
               ]
             }
           },
@@ -243,7 +248,12 @@
           ],
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Client-Platform-Id",
+                "value": "1000"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"email\": \"{{$randomEmail}}\",\n    \"fullName\": \"{{$randomFirstName}} {{$randomLastName}}\",\n    \"password\": \"Test123!\"\n}",
@@ -292,7 +302,12 @@
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Client-Platform-Id",
+                "value": "1000"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"fullName\": \"{{$randomFirstName}} {{$randomLastName}}\"\n}",
@@ -361,7 +376,12 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Client-Platform-Id",
+                "value": "1000"
+              }
+            ],
             "url": {
               "raw": "{{BASE_URL}}/auth/login",
               "host": [
@@ -390,10 +410,15 @@
           ],
           "request": {
             "auth": {
-              "type": "bearer"
+              "type": "noauth"
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Client-Platform-Id",
+                "value": "1000"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"refresh_token\": \"{{REFRESH_TOKEN}}\"\n}",

@@ -19,6 +19,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.reactive.RestResponse;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -87,7 +88,7 @@ class AuthController {
         return handleResponse(authFacadeService.refresh(request.refreshToken()));
     }
 
-    private static String[] decodeBasic(String header) {
+    private static String @Nullable [] decodeBasic(@Nullable String header) {
         if (header == null || !header.regionMatches(true, 0, "Basic ", 0, 6)) {
             return null;
         }

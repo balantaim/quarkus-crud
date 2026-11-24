@@ -114,8 +114,8 @@ http://localhost:5000/bootui
 
 ## Build production jar
 
-> [!NOTE]
-> You can safely remove dependency `quarkus-amazon-lambda-http` if the project is not used as lambda.
+> [!IMPORTANT]
+> Remove dependency `quarkus-amazon-lambda-http` if the project is not used as lambda.
 
 ```bash
 ./mvnw package -Dproduction -Dquarkus.package.jar.type=uber-jar -DskipTests
@@ -156,6 +156,8 @@ Build your jar or native image then test it with the following script:
     ```bash
     sam local start-api   --template target/sam.jvm.yaml
     ```
+
+Locale build uses port `3000`
 
 In order to deploy the lambda to AWS Cloud you will need to set up environment with API Gateway.
 
