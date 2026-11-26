@@ -8,7 +8,7 @@ import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.time.Instant;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,9 +37,7 @@ public class TokenService {
     }
 
     public String createAccessToken(User user) {
-        Set<String> authorities = user.getRoles().stream()
-                .map(role -> role.getName().name())
-                .collect(Collectors.toSet());
+        Set<String> rolesAndAuthorities = getUserRolesAndAuthorities(user);
 
         Instant timeNow = Instant.now();
 
@@ -57,7 +55,7 @@ public class TokenService {
                 .expiresAt(timeNow.plusMillis(ACCESS_TOKEN_EXPIRATION))
                 // "authorities": the user's roles, used by @RolesAllowed
                 // (needs smallrye.jwt.path.groups=authorities)
-                .claim(AUTHORITIES_CLAIM, authorities)
+                .claim(AUTHORITIES_CLAIM, rolesAndAuthorities)
                 // Start building the signed token (JWS)
                 .jws()
                 // Sign with RSA + SHA-256, using smallrye.jwt.sign.key.location
@@ -77,7 +75,7 @@ public class TokenService {
                 // "aud": "refresh", so it is rejected as a normal bearer token
                 .audience(REFRESH_AUDIENCE)
                 // "token_type": custom claim
-                .claim(TOKEN_TYPE_CLAIM, Collections.emptySet())
+                .claim(TOKEN_TYPE_CLAIM, REFRESH_AUDIENCE)
                 // "iat": the moment the token was created
                 .issuedAt(timeNow)
                 // "exp": the (longer) refresh lifetime
@@ -89,6 +87,24 @@ public class TokenService {
                 .algorithm(SignatureAlgorithm.RS256)
                 // Sign and return the compact string
                 .sign();
+    }
+
+    private Set<String> getUserRolesAndAuthorities(User user) {
+        // Roles with the ROLE_ prefix: ROLE_CUSTOMER, ROLE_ADMIN
+        Set<String> roles = user.getRoles().stream()
+                .map(role -> "ROLE_" + role.getName().name())
+                .collect(Collectors.toSet());
+
+        // Authorities without prefix: CUSTOMER_READ, ADMIN_WRITE...
+        Set<String> authorities = user.getRoles().stream()
+                .flatMap(role -> role.getAuthorities().stream())
+                .map(authority -> authority.getName().name())
+                .collect(Collectors.toSet());
+
+        // One combined array: roles + authorities
+        Set<String> combined = new HashSet<>(roles);
+        combined.addAll(authorities);
+        return combined;
     }
 
 }

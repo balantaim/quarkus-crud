@@ -12,6 +12,7 @@ import java.util.Optional;
 @ApplicationScoped
 public class UserRepository implements PanacheRepositoryBase<User, Long> {
 
+
     private static final String ACTIVE = "enabled = true " +
             "and accountNonExpired = true " +
             "and credentialsNonExpired = true " +
@@ -19,12 +20,15 @@ public class UserRepository implements PanacheRepositoryBase<User, Long> {
 
     private static final String FETCH_ROLES = "select u from User u left join fetch u.roles where ";
 
+    private static final String FETCH_ROLES_AND_AUTHORITIES =
+            "select u from User u left join fetch u.roles r left join fetch r.authorities where ";
+
     public Optional<User> findActiveByEmail(String email) {
-        return find(FETCH_ROLES + "u.email = ?1 and " + ACTIVE, email).firstResultOptional();
+        return find(FETCH_ROLES_AND_AUTHORITIES + "u.email = ?1 and " + ACTIVE, email).firstResultOptional();
     }
 
     public Optional<User> findActiveByUserId(String userId) {
-        return find(FETCH_ROLES + "u.userId = ?1 and " + ACTIVE, userId).firstResultOptional();
+        return find(FETCH_ROLES_AND_AUTHORITIES + "u.userId = ?1 and " + ACTIVE, userId).firstResultOptional();
     }
 
     public Optional<User> findByEmail(String email) {
